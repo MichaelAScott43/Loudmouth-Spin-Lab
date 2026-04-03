@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "Loudmouth Spin Lab",
+    "slug": "loudmouth-spin-lab",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1a0533"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.loudmouth.spinlab",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app does not use the camera.",
+        "UIRequiresFullScreen": true
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1a0533"
+      },
+      "package": "com.loudmouth.spinlab",
+      "versionCode": 1,
+      "permissions": []
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "static",
+      "name": "Loudmouth Spin Lab",
+      "shortName": "SpinLab",
+      "description": "Dr. Loudmouth's casino spin lab game — play on web, iOS, and Android.",
+      "backgroundColor": "#1a0533",
+      "themeColor": "#ffd700"
+    },
+    "plugins": ["expo-font"],
+    "extra": {
+      "facebookAppId": "YOUR_FACEBOOK_APP_ID"
+    }
+  }
+}

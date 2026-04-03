@@ -1,0 +1,15 @@
+{
+  "instant_game": {
+    "version": "1.0.0",
+    "description": "Dr. Loudmouth's casino spin lab — a fun slot machine game for all platforms.",
+    "orientation": "portrait",
+    "platform": {
+      "mobile": {
+        "url": "index.html"
+      },
+      "desktop": {
+        "url": "index.html"
+      }
+    }
+  }
+}

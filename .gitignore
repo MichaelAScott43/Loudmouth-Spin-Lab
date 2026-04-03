@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.expo/
+dist/
+web-build/
+
+# Native builds
+ios/
+android/
+
+# Environment & secrets
+.env
+.env.local
+google-services-key.json
+*.p8
+*.p12
+*.mobileprovision
+
+# Logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+expo-env.d.ts
+
+# macOS
+.DS_Store
+
+# Editor
+.idea/
+.vscode/
+
+# Test coverage
+coverage/
