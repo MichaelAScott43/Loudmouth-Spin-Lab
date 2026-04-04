@@ -60,7 +60,7 @@ export class Leaderboard {
   showLeaderboard(scene) {
     const { width, height } = scene.scale;
 
-    // Dim overlay
+    // Dim overlay – tracked separately so it can be destroyed in the close handler.
     const overlay = scene.add.graphics();
     overlay.fillStyle(0x000000, 0.8);
     overlay.fillRect(0, 0, width, height);
@@ -72,35 +72,40 @@ export class Leaderboard {
     const panelW = width - 60;
     const panelH = height - 120;
 
-    const panel = scene.add.graphics();
-    panel.fillStyle(0x1a0a2e, 1);
-    panel.fillRoundedRect(panelX, panelY, panelW, panelH, 20);
-    panel.lineStyle(3, 0xffdd00, 1);
-    panel.strokeRoundedRect(panelX, panelY, panelW, panelH, 20);
+    // All UI objects are tracked so the close handler can destroy every one.
+    const uiElements = [overlay];
+    const trackAndAdd = (obj) => { uiElements.push(obj); return obj; };
 
-    scene.add.text(width / 2, panelY + 24, '🏆 Top Friends', {
+    trackAndAdd(scene.add.graphics())
+      .fillStyle(0x1a0a2e, 1)
+      .fillRoundedRect(panelX, panelY, panelW, panelH, 20)
+      .lineStyle(3, 0xffdd00, 1)
+      .strokeRoundedRect(panelX, panelY, panelW, panelH, 20);
+
+    trackAndAdd(scene.add.text(width / 2, panelY + 24, '🏆 Top Friends', {
       fontFamily: 'Arial Black, Arial',
       fontSize: '22px',
       color: '#ffdd00',
-    }).setOrigin(0.5, 0);
+    }).setOrigin(0.5, 0));
 
     // Loading indicator while we fetch entries.
-    const loading = scene.add.text(width / 2, panelY + 80, 'Loading…', {
+    const loading = trackAndAdd(scene.add.text(width / 2, panelY + 80, 'Loading…', {
       fontFamily: 'Arial',
       fontSize: '16px',
       color: '#aaaaff',
-    }).setOrigin(0.5, 0);
+    }).setOrigin(0.5, 0));
 
     this.getTopEntries().then((entries) => {
       loading.destroy();
 
       if (entries.length === 0) {
-        scene.add.text(width / 2, panelY + 80, 'No friends on the leaderboard yet.\nPlay with friends to compete!', {
-          fontFamily: 'Arial',
-          fontSize: '14px',
-          color: '#aaaacc',
-          align: 'center',
-        }).setOrigin(0.5, 0);
+        trackAndAdd(scene.add.text(width / 2, panelY + 80,
+          'No friends on the leaderboard yet.\nPlay with friends to compete!', {
+            fontFamily: 'Arial',
+            fontSize: '14px',
+            color: '#aaaacc',
+            align: 'center',
+          }).setOrigin(0.5, 0));
         return;
       }
 
@@ -111,24 +116,24 @@ export class Leaderboard {
         const medals = ['🥇', '🥈', '🥉'];
         const rankLabel = idx < 3 ? medals[idx] : `#${entry.rank}`;
 
-        scene.add.text(panelX + 20, rowY, rankLabel, {
+        trackAndAdd(scene.add.text(panelX + 20, rowY, rankLabel, {
           fontFamily: 'Arial',
           fontSize: '18px',
           color: '#ffdd00',
-        }).setOrigin(0, 0.5);
+        }).setOrigin(0, 0.5));
 
-        scene.add.text(panelX + 60, rowY, entry.name, {
+        trackAndAdd(scene.add.text(panelX + 60, rowY, entry.name, {
           fontFamily: 'Arial',
           fontSize: '15px',
           color: '#ffffff',
           wordWrap: { width: panelW - 140 },
-        }).setOrigin(0, 0.5);
+        }).setOrigin(0, 0.5));
 
-        scene.add.text(panelX + panelW - 20, rowY, `${entry.score}`, {
+        trackAndAdd(scene.add.text(panelX + panelW - 20, rowY, `${entry.score}`, {
           fontFamily: 'Arial Black, Arial',
           fontSize: '15px',
           color: '#ffdd00',
-        }).setOrigin(1, 0.5);
+        }).setOrigin(1, 0.5));
       });
     });
 
@@ -139,10 +144,11 @@ export class Leaderboard {
       color: '#ff4444',
     }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
 
+    trackAndAdd(closeBtn);
+
     closeBtn.on('pointerdown', () => {
       overlay.destroy();
-      panel.destroy();
-      closeBtn.destroy();
+      uiElements.forEach((el) => { if (el && el.active) el.destroy(); });
     });
   }
 

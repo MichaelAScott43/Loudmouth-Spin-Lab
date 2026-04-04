@@ -74,7 +74,14 @@ function handlePost(req, res) {
   // Basic sanity checks to prevent obvious coin inflation.
   const existing = memoryStore.get(playerID) || { coins: 1000, totalSpins: 0, biggestWin: 0 };
   const safeCoins = typeof coins === 'number' && coins >= 0 ? coins : existing.coins;
-  const safeBiggestWin = typeof biggestWin === 'number' && biggestWin >= 0
+
+  // Cap biggestWin to a reasonable ceiling (max single-spin payout: 5000 coins
+  // bet × 500× wild multiplier = 2,500,000). Reject values above this to
+  // prevent trivial coin inflation via the API.
+  const MAX_BIGGEST_WIN = 2_500_000;
+  const safeBiggestWin = typeof biggestWin === 'number' &&
+    biggestWin >= 0 &&
+    biggestWin <= MAX_BIGGEST_WIN
     ? Math.max(biggestWin, existing.biggestWin)
     : existing.biggestWin;
 

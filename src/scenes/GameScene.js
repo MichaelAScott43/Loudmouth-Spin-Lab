@@ -161,9 +161,9 @@ export default class GameScene extends Phaser.Scene {
         this._updateCoinDisplay();
         this._showWinLabel(payout);
 
-        // Update leaderboard for big wins.
-        if (payout > playerData.biggestWin - payout) {
-          leaderboard.updateScore(playerData.biggestWin);
+        // Update leaderboard when this win sets a new personal best.
+        if (payout > playerData.biggestWin) {
+          leaderboard.updateScore(payout);
         }
 
         // Trigger share for huge wins.
@@ -237,29 +237,34 @@ export default class GameScene extends Phaser.Scene {
     panel.lineStyle(3, 0x9933ff, 1);
     panel.strokeRoundedRect(width / 2 - 180, height / 2 - 120, 360, 240, 20);
 
-    this.add.text(width / 2, height / 2 - 80, "You're out of coins!", {
+    const title = this.add.text(width / 2, height / 2 - 80, "You're out of coins!", {
       fontFamily: 'Arial Black, Arial',
       fontSize: '22px',
       color: '#ff4444',
     }).setOrigin(0.5);
 
-    this._makeTextButton(width / 2, height / 2 - 20, '🎬 Watch Ad (+50 coins)', () => {
+    // Track all UI elements so they can all be destroyed together.
+    const uiElements = [overlay, panel, title];
+
+    const destroyAll = () => uiElements.forEach((el) => el.destroy());
+
+    const adBtn = this._makeTextButton(width / 2, height / 2 - 20, '🎬 Watch Ad (+50 coins)', () => {
       adsManager.showRewardedAd().then(({ rewarded }) => {
         if (rewarded) {
           playerData.addCoins(50);
           this._updateCoinDisplay();
           this.events.emit('coinsUpdated', playerData.coins);
-          overlay.destroy();
-          panel.destroy();
+          destroyAll();
         }
       });
     }, { fontSize: '16px', color: '#ffffff', backgroundColor: '#5522aa', padding: { x: 12, y: 10 } });
+    uiElements.push(adBtn);
 
-    this._makeTextButton(width / 2, height / 2 + 50, '🛍️ Visit Shop', () => {
-      overlay.destroy();
-      panel.destroy();
+    const shopBtn = this._makeTextButton(width / 2, height / 2 + 50, '🛍️ Visit Shop', () => {
+      destroyAll();
       this.scene.launch('Shop');
     }, { fontSize: '16px', color: '#1a0a2e', backgroundColor: '#ffdd00', padding: { x: 12, y: 10 } });
+    uiElements.push(shopBtn);
   }
 
   // ── Win display ────────────────────────────────────────────────────────────

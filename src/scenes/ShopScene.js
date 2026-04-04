@@ -155,7 +155,7 @@ export default class ShopScene extends Phaser.Scene {
           if (rewarded) {
             playerData.addCoins(offer.reward);
             this._balanceText.setText(`${playerData.coins} coins`);
-            this.scene.get('Game').events.emit('coinsUpdated', playerData.coins);
+            this._notifyGame();
           }
           btn.setInteractive({ useHandCursor: true }).setAlpha(1);
         });
@@ -172,7 +172,7 @@ export default class ShopScene extends Phaser.Scene {
       if (success && coins > 0) {
         playerData.addCoins(coins);
         this._balanceText.setText(`${playerData.coins} coins`);
-        this.scene.get('Game').events.emit('coinsUpdated', playerData.coins);
+        this._notifyGame();
         this._showFeedback(`✅ +${coins} coins added!`, '#44ff88');
       } else {
         this._showFeedback('Purchase failed. Please try again.', '#ff4444');
@@ -182,6 +182,14 @@ export default class ShopScene extends Phaser.Scene {
       this._showFeedback('Purchase cancelled.', '#aaaaaa');
       btn.setInteractive({ useHandCursor: true }).setAlpha(1);
     });
+  }
+
+  /** Safely emit coinsUpdated to Game scene (guard against scene not being active). */
+  _notifyGame() {
+    const gameScene = this.scene.get('Game');
+    if (gameScene) {
+      gameScene.events.emit('coinsUpdated', playerData.coins);
+    }
   }
 
   _showFeedback(message, color) {

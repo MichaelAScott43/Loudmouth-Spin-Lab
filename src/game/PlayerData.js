@@ -67,7 +67,9 @@ export class PlayerData {
    * @returns {Promise<boolean>} true if bonus was awarded, false otherwise.
    */
   async claimDailyBonus() {
-    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    // Use the player's local calendar date (YYYY-MM-DD) so the bonus window
+    // aligns with their timezone rather than UTC midnight.
+    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in local TZ
     if (this.dailySpinLastDate === today) return false;
 
     this.dailySpinLastDate = today;

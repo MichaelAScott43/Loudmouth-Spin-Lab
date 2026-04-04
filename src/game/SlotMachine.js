@@ -10,6 +10,8 @@ const REEL_W = 110;     // width of each reel strip
 const REEL_GAP = 8;     // gap between reels
 const SPIN_DURATION_BASE = 1200; // ms for first reel to stop
 const REEL_STAGGER = 300;        // ms between successive reel stops
+// A sprite that scrolls past this y-offset has left the visible reel window.
+const SCROLL_THRESHOLD = (VISIBLE_ROWS + 1) * SYMBOL_H;
 
 /**
  * Weighted reel strip.  Higher weight = more frequent appearance.
@@ -205,7 +207,7 @@ export class SlotMachine {
         // Wrap: if the topmost sprite has scrolled off the bottom, move it above.
         sprites.sort((a, b) => a.y - b.y);
         const bottom = sprites[sprites.length - 1];
-        if (bottom.y > (VISIBLE_ROWS + 1) * SYMBOL_H) {
+        if (bottom.y > SCROLL_THRESHOLD) {
           const newSym = elapsed < duration - 200 ? randomSymbol() : finalSymbol;
           bottom.y = sprites[0].y - SYMBOL_H;
           bottom.setTexture(`sym-${newSym}`);
