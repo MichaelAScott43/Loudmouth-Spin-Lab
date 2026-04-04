@@ -3,6 +3,8 @@
  * Handles preloading, showing, and graceful error recovery.
  */
 export class AdsManager {
+  // Replace these with your actual Audience Network placement IDs from
+  // Facebook Monetization Manager (monetizationmanager.facebook.com).
   static REWARDED_PLACEMENT_ID = 'YOUR_REWARDED_AD_PLACEMENT_ID';
   static INTERSTITIAL_PLACEMENT_ID = 'YOUR_INTERSTITIAL_AD_PLACEMENT_ID';
 

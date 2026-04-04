@@ -147,7 +147,7 @@ export class Leaderboard {
     trackAndAdd(closeBtn);
 
     closeBtn.on('pointerdown', () => {
-      overlay.destroy();
+      // overlay is already in uiElements, so destroy everything in one pass.
       uiElements.forEach((el) => { if (el && el.active) el.destroy(); });
     });
   }

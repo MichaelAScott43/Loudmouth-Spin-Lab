@@ -69,7 +69,12 @@ export class PlayerData {
   async claimDailyBonus() {
     // Use the player's local calendar date (YYYY-MM-DD) so the bonus window
     // aligns with their timezone rather than UTC midnight.
-    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD in local TZ
+    // toISOString() always produces YYYY-MM-DD in UTC; use getTimezoneOffset to
+    // shift to the player's local calendar date so the bonus window resets at
+    // local midnight rather than UTC midnight.
+    const now = new Date();
+    const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
+    const today = localDate.toISOString().split('T')[0]; // YYYY-MM-DD
     if (this.dailySpinLastDate === today) return false;
 
     this.dailySpinLastDate = today;
