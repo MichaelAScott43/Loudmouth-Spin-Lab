@@ -1,0 +1,25 @@
+{
+  "name": "loudmouth-spin-lab",
+  "version": "1.0.0",
+  "description": "Loudmouth Spin Lab – Facebook Instant Games slot machine",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:fb": "vite build && cd dist && zip -r ../loudmouth-spin-lab.zip . && cd ..",
+    "preview": "vite preview",
+    "test": "jest --passWithNoTests"
+  },
+  "dependencies": {
+    "phaser": "^3.87.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "jest": "^29.7.0",
+    "archiver": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {}
+  }
+}
