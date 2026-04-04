@@ -122,11 +122,43 @@ The resulting zip is what you upload to Facebook.
 
 ## 6. Upload to Facebook
 
+### Option A – Automated upload (recommended)
+
+Use the built-in upload script to build **and** push to Facebook in one command:
+
+```bash
+npm run deploy:fb
+```
+
+This runs `build:fb` (Vite build → zip) and then calls `scripts/upload-fb.js`,
+which POSTs the zip directly to the Facebook Graph API.
+
+**Before running, make sure your `.env` file contains:**
+
+```dotenv
+FB_APP_ID=your_app_id_here
+FB_APP_SECRET=your_app_secret_here
+```
+
+If the build zip already exists and you only want to (re-)upload it:
+
+```bash
+npm run upload:fb
+```
+
+After a successful upload the script prints the asset ID and a direct link to
+the Web Hosting dashboard. Click **★ Set as Production** there to make the
+version live.
+
+---
+
+### Option B – Manual upload via the App Dashboard
+
 1. In the App Dashboard, go to **Instant Games → Web Hosting**.
 2. Click **+ Upload Version**.
-3. Select `loudmouth-spin-lab.zip`.
+3. Select `loudmouth-spin-lab.zip` (produced by `npm run build:fb`).
 4. Once processing completes, click **★ Set as Production** to make it live.
-5. Use **QA Tool** (also on the Web Hosting page) to test inside a Facebook
+5. Use the **QA Tool** (also on the Web Hosting page) to test inside a Facebook
    context before submitting for review.
 
 ---
