@@ -11,6 +11,7 @@
     "upload:fb": "node scripts/upload-fb.js",
     "deploy:fb": "npm run build:fb && npm run upload:fb",
     "preview": "vite preview",
+    "start": "vite preview --host 0.0.0.0",
     "test": "jest --passWithNoTests"
   },
   "dependencies": {
