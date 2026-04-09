@@ -1,136 +1,153 @@
 # 🎰 Loudmouth Spin Lab
 
-Dr. Loudmouth's casino spin-lab game — available on **iOS**, **Android**, and **Facebook Instant Games**.
-
-Built with [Expo](https://expo.dev/) (React Native) so a single JavaScript codebase targets all three platforms.
-
----
-
-## Getting Started
-
-### Prerequisites
-
-| Tool | Version |
-|------|---------|
-| Node.js | ≥ 18 |
-| npm | ≥ 9 |
-| Expo CLI | `npm install -g expo-cli` |
-| EAS CLI | `npm install -g eas-cli` (for store builds) |
-
-```bash
-npm install
-```
+A **Facebook Instant Games** HTML5 slot machine built with **Phaser 3** and **Vite**, with
+monetisation via Audience Network ads and in-app purchases, leaderboards, daily bonuses,
+and social sharing – all backed by **Vercel serverless functions**.
 
 ---
 
-## Running Locally
+## Tech Stack
 
-```bash
-# iOS Simulator (requires macOS + Xcode)
-npm run ios
-
-# Android Emulator (requires Android Studio)
-npm run android
-
-# Web / Facebook Instant Games preview
-npm run web
-```
-
----
-
-## Building for Stores
-
-This project uses [EAS Build](https://docs.expo.dev/build/introduction/) to produce signed store-ready binaries.
-
-### 1. Log in to Expo
-
-```bash
-eas login
-```
-
-### 2. Build for Android (Google Play)
-
-```bash
-npm run build:android
-```
-
-Produces an **AAB** (Android App Bundle) ready for upload to the Google Play Console.
-
-### 3. Build for iOS (App Store)
-
-```bash
-npm run build:ios
-```
-
-Produces an **IPA** ready for upload to App Store Connect via [EAS Submit](https://docs.expo.dev/submit/introduction/) or Transporter.
-
-### 4. Submit directly from EAS
-
-```bash
-# Android → Google Play
-eas submit --platform android
-
-# iOS → App Store Connect
-eas submit --platform ios
-```
-
-> **Before submitting:** fill in your credentials in `eas.json` (`appleId`, `ascAppId`, `appleTeamId`) and supply a `google-services-key.json` service-account file for Android. These files are excluded from the repository via `.gitignore`.
-
----
-
-## Facebook Instant Games
-
-### Web build
-
-```bash
-npm run build:web
-```
-
-The output is placed in `dist/`. Compress the entire `dist/` folder to a ZIP and upload it in the [Facebook Developer Portal](https://developers.facebook.com/apps/) under **Instant Games → Web Hosting**.
-
-### SDK integration
-
-* The Facebook Instant Games SDK is loaded via `web/index.html` (the custom HTML template used for the web build).
-* `src/utils/fbInstant.js` wraps `FBInstant.initializeAsync()`, `FBInstant.startGameAsync()`, leaderboard score posting, and win-sharing.
-* On iOS/Android the same wrapper returns safe no-op stubs, so the game code is identical across all platforms.
-
-### Configuration
-
-1. Replace `"YOUR_FACEBOOK_APP_ID"` in `app.json` → `expo.extra.facebookAppId` with your real App ID.
-2. Update `fbapp-config.json` with your game details.
-
----
-
-## Running Tests
-
-```bash
-npm test
-```
+| Layer | Technology |
+|-------|-----------|
+| Game engine | [Phaser 3](https://phaser.io) |
+| Bundler | [Vite 5](https://vitejs.dev) |
+| Language | JavaScript (ES Modules) |
+| API / backend | [Vercel serverless functions](https://vercel.com/docs/functions) |
+| Platform | [Facebook Instant Games 8.0](https://developers.facebook.com/docs/games/instant-games) |
 
 ---
 
 ## Project Structure
 
 ```
-├── App.js                   # Root component — FB Instant Games init + navigation
-├── app.json                 # Expo config (iOS, Android, Web)
-├── eas.json                 # EAS Build & Submit config
-├── fbapp-config.json        # Facebook Instant Games config
-├── web/
-│   └── index.html           # Custom HTML template with FB Instant Games SDK
-├── assets/                  # App icons, splash screen, favicon
-└── src/
-    ├── components/
-    │   ├── SlotMachine.js
-    │   ├── SpinButton.js
-    │   └── ScoreBoard.js
-    ├── screens/
-    │   ├── HomeScreen.js
-    │   └── GameScreen.js
-    ├── utils/
-    │   ├── gameLogic.js     # Spin logic, payout calculation
-    │   └── fbInstant.js     # Facebook Instant Games SDK wrapper
-    └── __tests__/
-        ├── gameLogic.test.js
-        └── fbInstant.test.js
+loudmouth-spin-lab/
+├── api/
+│   ├── verify-purchase.js   # IAP receipt verification (Vercel function)
+│   └── player-data.js       # Server-side player data / anti-cheat (Vercel function)
+├── src/
+│   ├── main.js              # Entry point – bootstraps FBInstant + Phaser
+│   ├── fbinstant-mock.js    # Full FBInstant SDK mock for local dev
+│   ├── scenes/
+│   │   ├── BootScene.js     # First scene; hands off to PreloadScene
+│   │   ├── PreloadScene.js  # Procedural texture generation + loading bar
+│   │   ├── GameScene.js     # Core slot machine gameplay
+│   │   ├── HUDScene.js      # Parallel HUD (avatar, coins, buttons)
+│   │   └── ShopScene.js     # IAP / ad-offer coin shop overlay
+│   ├── game/
+│   │   ├── SlotMachine.js   # Animated 3-reel slot with Phaser tweens
+│   │   ├── PayTable.js      # Win evaluation + payout multipliers
+│   │   └── PlayerData.js    # Persistent player state via FBInstant storage
+│   ├── monetization/
+│   │   ├── AdsManager.js    # Rewarded + interstitial ad wrapper
+│   │   └── IAPManager.js    # In-app purchase flow + server verification
+│   └── social/
+│       ├── Leaderboard.js   # FBInstant leaderboard + in-game overlay
+│       └── Share.js         # Big-win share + friend invite
+├── index.html               # HTML entry point (includes FB SDK script tag)
+├── vite.config.js           # Single-bundle build config for FB Instant Games
+├── vercel.json              # Vercel routing + env references
+├── package.json
+└── DEPLOYMENT.md            # Full deployment guide
 ```
+
+---
+
+## Getting Started
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Run locally
+
+```bash
+npm run dev
+```
+
+Open **http://localhost:5173**. The real Facebook SDK is not loaded in local
+dev; the game automatically uses `src/fbinstant-mock.js` instead, so you can
+play the full game without a Facebook account.
+
+---
+
+## Building
+
+### Development build
+
+```bash
+npm run build && npm run preview
+```
+
+### Facebook Instant Games bundle
+
+```bash
+npm run build:fb
+```
+
+Produces `loudmouth-spin-lab.zip` – ready to upload to the Facebook App
+Dashboard under **Instant Games → Web Hosting**.
+
+---
+
+## Deployment
+
+See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for the complete step-by-step guide
+covering:
+
+- Facebook App setup (leaderboard, IAP products, Audience Network placements)
+- Environment variable configuration
+- Vercel API deployment
+- Facebook review submission checklist
+- Monetisation setup checklist
+
+---
+
+## Gameplay
+
+| Feature | Details |
+|---------|---------|
+| Reels | 3 reels, 3 visible rows, animated scroll with staggered stops |
+| Symbols | 8 symbols (Wild, 7, BAR, Bell, Cherry, Watermelon, Orange, Lemon) |
+| Payline | Single centre payline |
+| Bet sizes | 10 / 25 / 50 / 100 / 250 coins |
+| Starting coins | 1 000 (new players) |
+| Daily bonus | +100 coins once per calendar day |
+| Big win trigger | ≥ 10× bet → auto-share prompt |
+
+### Pay Table
+
+| Combination | Multiplier |
+|-------------|-----------|
+| Wild · Wild · Wild | 500× |
+| 7 · 7 · 7 | 200× |
+| BAR · BAR · BAR | 100× |
+| Bell · Bell · Bell | 50× |
+| Cherry · Cherry · Cherry | 30× |
+| Watermelon · Watermelon · Watermelon | 20× |
+| Orange · Orange · Orange | 15× |
+| Lemon · Lemon · Lemon | 10× |
+| Cherry · Cherry · any | 5× |
+| Cherry · any · any | 2× |
+
+Wild substitutes for any symbol in three-of-a-kind combinations.
+
+---
+
+## Environment Variables
+
+| Variable | Where used | Description |
+|----------|-----------|-------------|
+| `FB_APP_ID` | Vercel (server) | Facebook App ID |
+| `FB_APP_SECRET` | Vercel (server) | Facebook App Secret (never expose client-side) |
+| `VITE_FB_APP_ID` | Vite build (client) | Public App ID for client-side use |
+
+Create a `.env` file in the project root for local development (this file is gitignored).
+
+---
+
+## License
+
+Private – all rights reserved.

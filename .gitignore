@@ -31,3 +31,9 @@ expo-env.d.ts
 
 # Test coverage
 coverage/
+node_modules/
+dist/
+*.zip
+.env
+.env.local
+.vercel
